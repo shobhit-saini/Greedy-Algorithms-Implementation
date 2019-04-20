@@ -1,0 +1,109 @@
+#include <stdio.h>
+
+struct job 
+{ 
+   int id;      // Job Id 
+   int dead;    // Deadline of job 
+   int profit; // Profit if job is over before or on deadline
+   int availability;//Is the job available or over;
+};
+struct output
+{
+    int id;
+};
+struct job DAC_Mergesort(struct job[],int,int);
+int merge(struct job[],int,int,int,int);
+void jobsequencing(struct job arr[],int n,int max);
+int main()
+{
+   struct job arr[100];
+    int n,i;
+    printf("Enter no. of jobs");
+    scanf("%d",&n);
+    for(i=0;i<n;i++)
+    {
+        printf("Enter the %d job details:",i);
+        scanf("%d%d%d",&arr[i].id,&arr[i].dead,&arr[i].profit);
+    }
+    int max=arr[0].dead;
+    for(i=0;i<n;i++)
+    {
+        if(arr[i].dead>max)
+        {
+            max=arr[i].dead;
+        }
+        arr[i].availability=1;
+    }
+    printf("\nMaximum deadline:%d",max);
+    DAC_Mergesort(arr,0,n-1);
+    /* printf("Sorted Array:");
+    for(i=0;i<n;i++)
+    {
+        printf("\n%d\t%d\t%d\t%d",arr[i].id,arr[i].dead,arr[i].profit,arr[i].availability);
+    }*/
+   jobsequencing(arr,n,max);
+    return 0;
+}
+struct job DAC_Mergesort(struct job arr[],int i,int j)
+{
+     int mid;
+    if(i==j)
+    return(arr[i]);
+    else
+    {
+        mid=floor((i+j)/2);//DIVIDE--Time Complexity=O(1)
+        DAC_Mergesort(arr,i,mid);//CONQUER--T(n/2)
+        DAC_Mergesort(arr,mid+1,j);//CONQUER--T(n/2)
+        merge(arr,i,mid,mid+1,j);//MERGE algorithm Time Complexity=O(n)
+    }
+}
+int merge(struct job arr[],int i,int j,int k,int l)
+{
+   int i1=i;
+   int l2=l;
+    struct job b[100];
+    int m=0,q;
+      while(i<=j&&k<=l)
+      {
+      if(arr[i].profit<=arr[k].profit)
+      {
+          b[m++]=arr[i++];
+      }
+      else
+      {
+          b[m++]=arr[k++];
+      }
+      }
+      while(i<=j)
+      {
+          b[m++]=arr[i++];
+      }
+       while(k<=l)
+      {
+          b[m++]=arr[k++];
+      }
+    
+      for(i=i1,q=0;i<=l;i++,q++)
+		arr[i]=b[q];
+}
+void jobsequencing(struct job arr[],int n,int max)
+{
+    struct output b[n];
+    int p=n-1,i,j;
+    for(i=max-1;i>=0;i--)
+    {
+        for(j=n-1;j>=0;j--)
+        {
+            if(arr[j].dead>=i&&arr[j].availability==1)
+            {
+                b[p--].id=arr[j].id;
+                arr[j].availability=0;
+            }
+        }
+    }
+    printf("Job sequencing order:\n");
+    for(i=0;i<n;i++)
+    {
+        printf("%d\t",b[i]);
+    }
+}
